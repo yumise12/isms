@@ -1,0 +1,67 @@
+<html>
+<head>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/Chart.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/itemlist.js"></script>
+    <script src="js/catlist.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171536726-1"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-171536726-1');</script>
+
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+
+<body>
+
+    <nav class="navbar bg-dark navbar-dark" style="margin-bottom:16px">
+        <a class="navbar-brand" href="#">ISMS-P 인증기준 트레이닝</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#x" aria-expanded="true">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse " id="x" style="">
+            <ul class="nav navbar-nav" style="visibility: visible;">
+            <li class="nav-item">
+                <a class="nav-link" href="ismsp.htm?cat1=1.">1.관리체계 수립 및 운영</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="ismsp.htm?cat1=2.">2.보호대책 요구사항</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="ismsp.htm?cat1=3.">3.개인정보 처리단계별 요구사항</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="result.htm">REPORT</a>
+            </li>    
+            </ul>
+        </div>  
+    </nav>
+
+    <div class="container-fluid">
+        
+        <div class="wrapper border border-info">
+            <div id="chart-result-title" class="alert alert-info pt-1 pb-1 mt-1" role="alert">정답률 추이</div>
+            <canvas id="chart-result"></canvas>
+        </div>
+
+        <div class="wrapper border border-info">
+            <div class="alert alert-info pt-1 pb-1 mt-1" role="alert">인증기준 별 오답</div>
+            <canvas id="chart-wrong"></canvas>
+        </div>
+        
+        <div class="wrapper border border-info">
+            <div class="alert alert-info pt-1 pb-1 mt-1" role="alert">영역별 트레이닝 비율</div>
+            <canvas id="chart-cat"></canvas>
+        </div>
+        <button type='button' id='btnsave' class='btn btn-success' onclick='javascript:delresult();'>전제 데이터 초기화 하기</button><br/>
+    </div>
+
+    <script>var dbname="IndexedDB_ISMS";var storename="result";var version=1;var db=null;var chart;var chart2;var chart3;var item_obj=new Array;var ansrate_array=new Array;getitem("1.");getitem("2.");getitem("3.");function getitem(cat){item_list=(jQuery.parseJSON(itemlist))[cat];$.each(Object.keys(item_list),function(key,val){$.each(item_list[val],function(key,val){item_obj[key]=val;})});}function loadresult(indexname,callback){var returndata=[];if(window.indexedDB){var request=indexedDB.open(dbname,version);request.onerror=function(event){$("#chart-result-title").html("No Data ");};request.onsuccess=function(event){db=request.result;var transaction=db.transaction([storename],"readonly");var store=transaction.objectStore(storename);var index=store.index(indexname);index.openCursor().onsuccess=function(event){var cursor=event.target.result;if(cursor){var data=cursor.value;console.log(data[indexname]);console.log(data["id"]);callback(data[indexname],data["id"]);cursor.continue();}}};}}var data1={labels:[],datasets:[{data:[],label:"정답률 추이",borderColor:"skyblue",borderWidth:1,fill:false}]};var data2={labels:[],datasets:[{data:[],label:"인증 기준 별 오답 건수",borderColor:"rgba(255, 10, 13, 0.5)",backgroundColor:"rgba(255, 10, 13, 0.1)",borderWidth:1,fill:false}],};var data3={labels:[],datasets:[{data:[],label:"영역 별 트레이닝 실행 비율",borderColor:["rgba(151,187,205,0.5)","rgba(50, 155, 255, 0.5)","rgba(0, 166, 0, 0.5)"],backgroundColor:["rgba(151,187,205,0.1)","rgba(50, 155, 255, 0.1)","rgba(0, 166, 0, 0.1)"],borderWidth:1,fill:false}],};loadresult("ansrate",drawchart);loadresult("wronglist",drawchart_wrong);loadresult("cat1",drawchart_cat);function drawchart(chart_result,id){ansrate_array[id]=chart_result;data1.datasets[0].data.push(chart_result);data1.labels.push(data1.datasets[0].data.length);console.log(chart_result);if(chart)chart.destroy();data1.datasets[0].data=[];for(var i=0;i<ansrate_array.length;i++){if(ansrate_array[i]){data1.datasets[0].data.push(ansrate_array[i]);}}var total=0;for(var i=0;i<data1.datasets[0].data.length;i++){total+=data1.datasets[0].data[i];}var avg=Math.round(total/data1.datasets[0].data.length);$("#chart-result-title").html("정답률 추이 (평균:"+avg+" 점)");chart=new Chart(document.getElementById("chart-result"),{type:'line',data:data1,options:{lineAt:90}});}function drawchart_wrong(chart_result,id){for(var i=0;i<chart_result.length;i++){var dataexist=data2.labels.indexOf(item_obj[chart_result[i]]);if(dataexist>=0){data2.datasets[0].data[dataexist]++;}else{data2.datasets[0].data.push(1);data2.labels.push(item_obj[chart_result[i]]);}var options={scales:{xAxes:[{ticks:{stepSize:1,beginAtZero:true,},}],},}
+if(chart2)chart2.destroy();chart2=new Chart(document.getElementById("chart-wrong"),{type:'horizontalBar',data:data2,options:options});}}function drawchart_cat(chart_result,id){var dataexist=data3.labels.indexOf(topcat[chart_result]);if(dataexist>=0){data3.datasets[0].data[dataexist]++;}else{data3.datasets[0].data.push(1);data3.labels.push(topcat[chart_result]);}if(chart3)chart3.destroy();chart3=new Chart(document.getElementById("chart-cat"),{type:'doughnut',data:data3,options:{rotation:2*Math.PI,circumference:2*Math.PI,legend:{position:'right'}}});}function delresult(){if(window.indexedDB){var request=indexedDB.open(dbname,version);request.onerror=function(event){$("#chart-result-title").html("No DB ");};request.onsuccess=function(event){db=request.result;var transaction=db.transaction([storename],"readwrite");var store=transaction.objectStore(storename);store.clear();alert("DB 삭제 완료");location.reload();};}}</script>
+    <script data-ad-client="ca-pub-2402307957912340" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</body>
+
+
+</html>

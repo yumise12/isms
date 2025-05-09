@@ -1,0 +1,59 @@
+<html>
+<head>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/Chart.min.js"></script>
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<script src="js/itemlist.js"></script>
+<script src="js/catlist.js"></script>
+<script src="info.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width">
+</head>
+
+<body>
+    <nav class="navbar bg-dark navbar-dark" style="margin-bottom:16px">
+        <a class="navbar-brand" href="#">트레이닝</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#x" aria-expanded="true">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse " id="x" style="">
+            <ul class="nav navbar-nav" style="visibility: visible;">
+            <!--<li class="nav-item">
+                <a class="nav-link" href="law.htm">1.법령 트레이닝</a>
+            </li>-->
+            <li class="nav-item">
+                <a class="nav-link" href="ismsp.htm?cat1=1.">ISMS-P인증기준 트레이닝</a>
+            </li>
+            </ul>
+        </div>  
+    </nav>
+    <div class="container-fluid">
+        <!--<a href="law.htm">
+            <button type="button" class="btn btn-primary btn-lg btn-block" style="height:100px;">1.법령 트레이닝</button>
+        </a>-->
+        <a href="ismsp.htm">
+            <button type="button" class="btn btn-success btn-lg btn-block" style="height:100px;">인증기준 트레이닝(Click)</button>
+        </a>
+        <div class="alert alert-primary p-1" role="alert">
+            <b>ISMS-P 트레이닝 2023년 버전</b>
+        </div>
+        <dl class="row">
+            <dt class="col-sm-2">제작자</dt>
+            <dd class="col-sm-8">K씨</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">블로그</dt>
+            <dd class="col-sm-8"><a href="https://blog.naver.com/renucs" traget="_blank">blog.naver.com/renucs</a></dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">카페</dt>
+            <dd class="col-sm-8"><a href="https://cafe.naver.com/openpecom">cafe.naver.com/openpecom</a></dd>
+        </dl>
+        <hr/>
+        <script>document.write(info);</script>
+    </div>
+</body>
+
+
+</html>

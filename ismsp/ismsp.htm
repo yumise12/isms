@@ -1,0 +1,117 @@
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
+    <script src="js/itemlist.js?2024050401"></script>
+    <script src="js/catlist.js"></script>
+    <script src="js/caselist.js?2024050402"></script>
+    <script src="js/objlist.js"></script>    
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171536726-1"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-171536726-1');</script>
+
+<script>var current_url="/";var request_uri="/";var waiting_message="데이터 로딩 중입니다. 잠시만 기다려주세요.";</script>
+
+<meta name="viewport" content="width=device-width">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<style></style>
+</head>
+
+<body>
+
+<nav class="navbar bg-dark navbar-dark" style="margin-bottom:16px">
+    <span class="navbar-brand">
+		<a href="./" class="navbar-brand">Home</a>| 인증기준 트레이닝
+	</span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#x" aria-expanded="true">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse " id="x" style="">
+        <ul class="nav navbar-nav" style="visibility: visible;">
+        <li class="nav-item">
+            <a class="nav-link" href="ismsp.htm?cat1=1.">1.관리체계 수립 및 운영</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="ismsp.htm?cat1=2.">2.보호대책 요구사항</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="ismsp.htm?cat1=3.">3.개인정보 처리단계별 요구사항</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="result.htm">REPORT</a>
+        </li>    
+        </ul>
+    </div>  
+</nav>
+
+<div class="container-fluid">
+    문제순서(<span id="seq">1</span>/<span id="total">0</span>)
+    정답률: <span id="ansrate">0</span>% (정답:<span id="ok">0</span> 오답:<span id="wrong">0</span>)
+    <a href="javascript:viewHint()"><span class="badge badge-secondary">view HINT</span></a>
+    <div class="progress" style="height: 10px;">
+        <div id="ansratebar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    
+    <div class="alert alert-info pt-1 pb-1 mt-1" role="alert"><b>"<span id="topcat"></span>"</b> 결함 사례</div>
+
+    <div class="well border border-success rounded p-1 m-1 bg-light " id="case">
+        Loading..
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-12">
+
+            <hr/>
+        </div>
+        
+        <div class="col-md-12">
+            <div class="d-flex">
+                <ul id="MainTab" class="nav nav-pills flex-column">
+                     
+                </ul>
+                <div id="SubTab" class="tab-content border rounded p-3 w-100">
+                </div>
+            </div>
+        </div>
+        
+        <div class="clearfix"></div>
+        
+        <!-- Modal -->
+        <div class="modal fade" id="layerpop">
+            <div class="modal-dialog" style="background-color:#FFF">
+                
+                    <div class="modal-header">
+                        
+                        <h4 class="modal-title" id="ModalLabel">결과</h4>
+                    </div>
+                    <div class="modal-body small" id="ModalContent">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">닫기</a></button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="javascript:nextexam()">다음문제</button>
+                    </div>
+
+            </div>
+        </div>
+        <!--Modal-->
+
+
+    </div>
+    <hr/>    
+    
+    <div class="clearfix"></div>
+
+</div>
+
+
+<script>var index=0;var cur_item;var flag=0;var item_list=new Array;var item_list_shuffle=new Array;var case_list=jQuery.parseJSON(caselist);var obj_list=jQuery.parseJSON(objlist);var item_obj={};var wrong_list=new Array();var vansrate=0;var cat1=getParam("cat1");var dbname="IndexedDB_ISMS";var storename="result";var version=1;var db=null;function init_item(){index=0;cur_item=0;flag=0;item_list.length=0;item_list_shuffle.length=0;item_obj.length=0;wrong_list.length=0;vansrate=0;if(window.indexedDB){var request=indexedDB.open(dbname,version);request.onerror=function(event){alert("IndexedDB Error");};request.onupgradeneeded=function(event){db=request.result;store=db.createObjectStore("result",{keyPath:'id',autoIncrement:true});store.createIndex('cat1','cat1',{unique:false});store.createIndex('ansrate','ansrate',{unique:false});store.createIndex('wronglist','wronglist',{unique:false});};request.onsuccess=function(event){db=request.result;var transaction=db.transaction([storename],"readwrite");var store=transaction.objectStore(storename);};}$("#ansrate").html(vansrate);$('div#ansratebar').width(vansrate+'%');$("#seq").html(1);$("#ok").html(0);$("#wrong").html(0);$("#topcat").html(topcat[cat1]);item_list=(jQuery.parseJSON(itemlist))[cat1];$.each(Object.keys(item_list),function(key,val){$.each(item_list[val],function(key,val){item_list_shuffle.push(key);item_obj[key]=val;})});item_list_shuffle=shuffle(item_list_shuffle);loaditem(item_list_shuffle[index]);$("#total").html(item_list_shuffle.length);cur_item=item_list_shuffle[index];loadTab(cat1);}function loaditem(data){console.log(data);$("#case").html("<span class='badge badge-info'>사례</span>"+shuffle(case_list[data])[0]);$("#case").append("<div id='hint'> </div>");cat_case=data;}function loadTab(cat){$("#MainTab").html("");$("#SubTab").html("");tab_list=jQuery.parseJSON(catlist);$.each(tab_list[cat],function(key,value){if(key=='1.1.'||key=='2.1.'||key=='3.1.'){active="class=\"active\"";}else{active="";}$("#MainTab").append("<li class='nav-item'><a href='#Lcat"+key+"' data-target='#Lcat"+key+"' data-toggle='tab' class='nav-link small p-1 '>"+key+" "+value+"</a></li>");loadSubTab(key);});}function loadSubTab(cat){tab_list=(jQuery.parseJSON(itemlist))[cat1];if(cat=='1.1.'||cat=='2.1.'||cat=='3.1.'){active="active show";}else{active="";}contentSubTab="<div id='Lcat"+cat+"' class='tab-pane fade "+active+"'>";$.each(tab_list[cat],function(key,value){contentSubTab+="<p class=' m-2'><a href='#' class='text-dark small ' onclick=javascript:checkitem('"+key+"')>"+key+" "+value+"</a></p>";});contentSubTab+="</div>";$("#SubTab").append(contentSubTab);}function nextexam(){if(index>=item_list_shuffle.length-1){$("#case").html("<b>테스트 결과</b><br/>");$("#case").append("정답률:"+vansrate+"%");$("#case").append("(오답 "+wrong_list.length+"건)<br/><br/>");$("#case").append("<b>오답항목</b><br/>");$.each(wrong_list,function(index,item){$("#case").append(item+" "+item_obj[item]+"<br/>");});$("#case").append("<button type='button' id='btnsave' class='btn btn-success' onclick='javascript:saveresult();'>결과 저장하기</button><br/>");return;}if(flag!=0){flag=0;index++;loaditem(item_list_shuffle[index]);cur_item=item_list_shuffle[index];$("#seq").html(index+1);}}function loadcontent(cat3){res="<b>"+cat3+item_obj[cat3]+"</b> 를 위반한 결함사례<br/>";$.each(case_list[cat3],function(key,val){res+="<span class='badge badge-info'>사례</span>"+val+"<br/>";});$("#ModalContent").html(res);$('#layerpop').modal('show');}function viewHint(){$("#hint").html("<br/><b>Hint:</b> "+cur_item);}function checkitem(check_cat){if(cat_case==check_cat){$("#ModalLabel").html("정답입니다!");$("#ModalContent").html("<p><span class='badge badge-success'>통제 목적</span>"+obj_list[cat_case]+"</p>");$.each(case_list[cur_item],function(key,val){$("#ModalContent").append("<p><span class='badge badge-info'>사례</span>"+val+"<p/>");});$("#layerpop").modal('show');if(flag==0){$("#ok").html(parseInt($("#ok").text(),10)+1);}flag=1;nextexam();}else{$("#ModalLabel").html("오답입니다!");loadcontent(check_cat);$("#case").html(" ");$.each(case_list[cur_item],function(key,val){$("#case").append("<p><span class='badge badge-info'>사례</span>"+val+"<p/>");});$("#case").append("<div id='hint'> </div>");if(flag<2){flag=2;$("#wrong").html(parseInt($("#wrong").text(),10)+1);wrong_list.push(item_list_shuffle[index]);}}ansrate();}function ansrate(){if(index>0){vansrate=Math.round((index-wrong_list.length)/index*100);$("#ansrate").html(vansrate);$('div#ansratebar').width(vansrate+'%');}}function saveresult(){if(window.indexedDB){var request=indexedDB.open(dbname,version);request.onerror=function(event){alert("IndexedDB Error");};request.onsuccess=function(event){db=request.result;var transaction=db.transaction([storename],"readwrite");var store=transaction.objectStore(storename);store.add({"cat1":cat1});store.add({"ansrate":vansrate});store.add({"wronglist":wrong_list});alert("저장 완료");};}else{alert("IndexedDB를 지원하지 않는 단말기입니다.");}$("#btnsave").attr('disabled',true);$("#btnsave").html("완료");}function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));tmp=a[i];a[i]=a[j];a[j]=tmp;}return a;}function getParam(arg){var params=location.search.substr(location.search.indexOf("?")+1);var sval="";params=params.split("&");for(var i=0;i<params.length;i++){temp=params[i].split("=");if([temp[0]]==arg){sval=temp[1];}}if(!sval)sval="1.";return sval;}$(document).ready(init_item());</script>
+
+<script data-ad-client="ca-pub-2402307957912340" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</body>
+</html>
